@@ -20,17 +20,28 @@ class PlaceController extends Controller
     public function __construct(private PlaceService $service) {}
 
     /**
-     * List places, optional filter by name via ?name=example
+     * List places, optional filter by name via ?name=<name>
      */
     public function index(Request $request)
     {
-        $places = Place::all();
+        $places = Place::query()
+            ->when($request->filled('name'), function ($q) use ($request) {
+                $q->where('name', 'ilike', '%' . $request->name . '%');
+            })
+            ->when($request->filled('city'), function ($q) use ($request) {
+                $q->where('city', 'ilike', '%' . $request->city . '%');
+            })
+            ->when($request->filled('state'), function ($q) use ($request) {
+                $q->where('state', 'ilike', '%' . $request->state . '%');
+            })
+            ->get();
 
-        if ($places->isEmpty()) {
-            return $this->error('No places found', 404);
-        }
-
-        return $this->success($places, 'Places retrieved successfully', 200);
+        return response()->json([
+            'success' => true,
+            'status'  => 'ok',
+            'code'    => 200,
+            'data'    => $places,
+        ]);
     }
 
     /**
