@@ -20,7 +20,7 @@ class PlaceController extends Controller
     public function __construct(private PlaceService $service) {}
 
     /**
-     * List places, optional filter by name via ?name=<name>
+     * List places, optional filter by name, city and state
      */
     public function index(Request $request)
     {
@@ -36,12 +36,15 @@ class PlaceController extends Controller
             })
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'status'  => 'ok',
-            'code'    => 200,
-            'data'    => $places,
-        ]);
+        $message = $places->isEmpty()
+            ? 'No places found'
+            : 'Places retrieved successfully';
+
+        return $this->success(
+            PlaceResource::collection($places),
+            $message,
+            200
+        );
     }
 
     /**
@@ -75,11 +78,11 @@ class PlaceController extends Controller
      */
     public function show(Place $place)
     {
-        if (!$place) {
-            return $this->error('Place not found', 404);
-        }
-
-        return $this->success(new PlaceResource($place), 'Place retrieved successfully', 200);
+        return $this->success(
+            new PlaceResource($place),
+            'Place retrieved successfully',
+            200
+        );
     }
 
     /**
@@ -123,7 +126,7 @@ class PlaceController extends Controller
 
         try {
             $this->service->delete($place);
-            return $this->success(null, 'Place deleted successfully', 204);
+            return $this->success(null, 'Place deleted successfully', 200);
         } catch (\Exception $e) {
             return $this->error('Failed to delete place: ' . $e->getMessage(), 500);
         }
