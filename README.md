@@ -75,6 +75,10 @@ docker compose up -d
 
 ## Request & Response Examples
 
+- For local testing and API consumption, requests should include the following headers:
+Accept: application/json
+Content-Type: application/json
+
 ### 1. GET /api/places
 GET http://localhost:8000/api/places
 ```json
