@@ -57,6 +57,13 @@ docker compose exec app php artisan      # Run Artisan commands
 docker compose logs -f                   # View logs
 docker compose ps                        
 
+### Resetting the environment
+If you want to start the project from scratch and remove all database data and volumes, run:
+```bash
+docker compose down -v
+docker compose up -d
+```
+
 ## API Endpoints
 | Method | Endpoint         | Description             |
 | ------ | ---------------- | ----------------------- |
@@ -80,6 +87,7 @@ GET http://localhost:8000/api/places
     {
       "id": 1,
       "name": "Central Park",
+      "slug": "central-park",
       "city": "New York",
       "state": "NY",
     }
@@ -108,11 +116,41 @@ GET http://localhost:8000/api/places/1
   "data": {
     "id": 1,
     "name": "Central Park",
+    "slug": "central-park",
     "city": "New York",
     "state": "NY"
   }
 }
 ```
+- Filtering Places
+You can filter the list of places by name, city, or state using query parameters.
+
+GET http://localhost:8000/api/places?name=cent
+```json
+{
+  "success": true,
+  "status": "ok",
+  "code": 200,
+  "message": "Place retrieved successfully",
+  "data": {
+    "id": 1,
+    "name": "Central Park",
+    "slug": "central-park",
+    "city": "New York",
+    "state": "NY"
+  }
+}
+```
+- Query Parameters:
+
+| Parameter | Type   | Description                        |
+| --------- | ------ | ---------------------------------- |
+| `name`    | string | Filter places containing this name |
+| `city`    | string | Filter places in the given city    |
+| `state`   | string | Filter places in the given state   |
+
+Multiple filters can be combined. For example:
+GET /api/places?city=New+York&state=NY
 
 ### 3. POST /api/places
 Request Body:
@@ -134,8 +172,8 @@ Response:
   "data": {
     "id": 2,
     "name": "Golden Gate Park",
+    "slug": "golde-gate-park",
     "city": "San Francisco",
-    "slug": "san-francisco",
     "state": "CA",
   }
 }
@@ -157,8 +195,8 @@ Response:
   "data": {
     "id": 2,
     "name": "Updated Park Name",
+    "slug": "updated-park-name",
     "city": "San Francisco",
-    "slug": "san-francisco",
     "state": "CA",
   }
 }
