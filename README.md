@@ -82,8 +82,6 @@ GET http://localhost:8000/api/places
       "name": "Central Park",
       "city": "New York",
       "state": "NY",
-      "created_at": "2025-12-13T17:40:33.000000Z",
-      "updated_at": "2025-12-13T17:40:33.000000Z"
     }
   ]
 }
@@ -122,6 +120,7 @@ Request Body:
 {
   "name": "Golden Gate Park",
   "city": "San Francisco",
+  "slug": "san-francisco",
   "state": "CA"
 }
 ```
@@ -136,6 +135,7 @@ Response:
     "id": 2,
     "name": "Golden Gate Park",
     "city": "San Francisco",
+    "slug": "san-francisco",
     "state": "CA",
   }
 }
@@ -158,9 +158,8 @@ Response:
     "id": 2,
     "name": "Updated Park Name",
     "city": "San Francisco",
+    "slug": "san-francisco",
     "state": "CA",
-    "created_at": "2025-12-13T18:00:00.000000Z",
-    "updated_at": "2025-12-13T18:10:00.000000Z"
   }
 }
 ```
@@ -194,3 +193,39 @@ GET /api/places?name=Park&city=New York&state=NY
 ### To reset the database:
 docker compose exec app php artisan migrate:fresh
 ### Test the API easily with Postman or any HTTP client.
+
+## Running Tests
+
+This project uses PHPUnit for automated testing.
+
+- Run all tests:
+
+```bash
+docker compose exec app bash
+php vendor/bin/phpunit
+```
+
+- Run a specific test class:
+
+```bash
+php vendor/bin/phpunit --filter PlaceServiceTest
+```
+
+## Troubleshooting
+
+### Permission issues on storage and cache (Docker)
+If you encounter errors like:
+The stream or file "/var/www/storage/logs/laravel.log" could not be opened
+
+It usually means Laravel cannot write to `storage` or `bootstrap/cache`.
+
+#### Quick fix (inside the PHP container):
+
+```bash
+docker compose exec app bash
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+```
+### Notes:
+Permissions for Laravel writable directories are already set in the Dockerfile.
+When using bind mounts on some operating systems (e.g. Windows), manual permission adjustment may still be required.

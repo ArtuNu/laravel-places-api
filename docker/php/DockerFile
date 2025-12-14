@@ -13,5 +13,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www
+# Laravel required writable directories
+RUN mkdir -p storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+USER www-data
