@@ -13,12 +13,14 @@ class PlaceService
     /**
      * List places with optional name filter and pagination.
      */
-    public function list(?string $name = null, int $perPage = 15): LengthAwarePaginator
+    public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Place::query();
 
-        if ($name) {
-            $query->where('name', 'like', '%' . $name . '%');
+        foreach ($filters as $key => $value) {
+            if ($value) {
+                $query->where($key, 'ilike', "%{$value}%");
+            }
         }
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
